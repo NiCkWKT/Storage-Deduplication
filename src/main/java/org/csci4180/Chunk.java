@@ -1,11 +1,13 @@
 package org.csci4180;
 
+import java.security.MessageDigest;
 import java.util.Arrays;
 
 public class Chunk {
     private byte[] data;
     private int startOffset;
     private int endOffset;
+    private byte[] fingerprint;
 
     public Chunk(byte[] fileData, int start, int end) {
         this.startOffset = start;
@@ -13,6 +15,14 @@ public class Chunk {
 
         // Copy relevant byte range
         data = Arrays.copyOfRange(fileData, start, end + 1);
+
+        try {
+            MessageDigest md = MessageDigest.getInstance("SHA-1");
+            md.update(data, start, end - start + 1);
+            fingerprint = md.digest();
+        } catch (Exception e) {
+            System.err.println("Cannot convert to fingerprint using SHA-1");
+        }
     }
 
     public byte[] getData() {
@@ -21,6 +31,10 @@ public class Chunk {
 
     public int getStartOffset() {
         return startOffset;
+    }
+
+    public byte[] getFingerprint() {
+        return fingerprint;
     }
 
     @Override
@@ -36,12 +50,14 @@ public class Chunk {
 
     @Override
     public boolean equals(Object o) {
-        Chunk other = (Chunk) o;
-        return Arrays.equals(this.data, other.data);
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Chunk chunk = (Chunk) o;
+        return Arrays.equals(fingerprint, chunk.fingerprint);
     }
 
     @Override
     public int hashCode() {
-        return Arrays.hashCode(data);
+        return Arrays.hashCode(fingerprint);
     }
 }
