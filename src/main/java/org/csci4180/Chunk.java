@@ -7,7 +7,7 @@ public class Chunk {
     private byte[] data;
     private int startOffset;
     private int endOffset;
-    private byte[] fingerprint;
+    private FingerPrint fingerprint;
 
     public Chunk(byte[] fileData, int start, int end) {
         this.startOffset = start;
@@ -18,9 +18,11 @@ public class Chunk {
 
         try {
             MessageDigest md = MessageDigest.getInstance("SHA-1");
-            md.update(data, start, end - start + 1);
-            fingerprint = md.digest();
+            md.update(data, 0, data.length);
+            byte[] checksumBytes = md.digest();
+            fingerprint = new FingerPrint(checksumBytes);
         } catch (Exception e) {
+            e.printStackTrace();
             System.err.println("Cannot convert to fingerprint using SHA-1");
         }
     }
@@ -33,7 +35,7 @@ public class Chunk {
         return startOffset;
     }
 
-    public byte[] getFingerprint() {
+    public FingerPrint getFingerprint() {
         return fingerprint;
     }
 
@@ -48,16 +50,7 @@ public class Chunk {
         return endOffset;
     }
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        Chunk chunk = (Chunk) o;
-        return Arrays.equals(fingerprint, chunk.fingerprint);
-    }
-
-    @Override
-    public int hashCode() {
-        return Arrays.hashCode(fingerprint);
+    public int getSize() {
+        return endOffset - startOffset + 1;
     }
 }
