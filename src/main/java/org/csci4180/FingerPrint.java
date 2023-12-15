@@ -13,6 +13,10 @@ public class FingerPrint implements Serializable {
         this.checksumBytes = checksumBytes;
     }
 
+    public byte[] getChecksumBytes() {
+        return checksumBytes;
+    }
+
     public FingerPrint() {
 
     }

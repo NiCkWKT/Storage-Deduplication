@@ -16,12 +16,10 @@ public class CloudStorage {
         FileRecipe recipe = new FileRecipe();
         Container container = new Container(fpi.getNumOfContainers());
         fpi.setNumOfChunks(fpi.getNumOfChunks() + chunks.size());
-//        int totalSize = 0;
-
         for (Chunk chunk : chunks) {
             FingerPrint fp = chunk.getFingerprint();
             int size = chunk.getSize();
-            recipe.add(fp, chunk.getSize());
+            recipe.add(fp, size);
             if (!fpi.isContained(fp)) {
                 if (container.getOffset() + size > 1048576) {
                     container.saveChunks();
@@ -31,10 +29,7 @@ public class CloudStorage {
                 fpi.setNumOfUniqueChunks(fpi.getNumOfUniqueChunks() + 1);
                 fpi.setUniqueByteSum(fpi.getUniqueByteSum() + size);
             }
-//            totalSize += 1;
-//            System.out.println(size);
         }
-//        System.out.println(totalSize);
 
         if (container.getOffset() > 0) {
             fpi.setNumOfContainers(container.getContainerID() + 1);
@@ -47,6 +42,7 @@ public class CloudStorage {
         fpi.setByteSum(fpi.getByteSum() + length);
         fpi.writeTo();
         fpi.printReport();
+//        System.out.println(recipe.getFpList().size());
         recipe.writeTo(dest);
     }
 
@@ -66,14 +62,33 @@ public class CloudStorage {
 
         FileOutputStream fos = new FileOutputStream(outFile);
 
-//        System.out.println(fr.getFpList().size());
+        System.out.println(fr.getFpList().size());
 
-        for (int i = 0; i < fr.getFpList().size() ; i++) {
+//        for (int i = 0; i < fr.getFpList().size() ; i++) {
+//            ChunkMetadata metadata = fpi.getChunkMetadata(fr.getFpList().get(i));
+//            Container container = new Container(metadata.getContainerId(), metadata.getOffset());
+//            byte[] data = container.readFrom(fr.getSizeList().get(i));
+//            fos.write(data);
+//        }
+
+        for(int i = 0; i < fr.getFpList().size(); i++) {
             ChunkMetadata metadata = fpi.getChunkMetadata(fr.getFpList().get(i));
-            Container container = new Container(metadata.getContainerId(), metadata.getOffset());
-            byte[] data = container.readFrom(fr.getSizeList().get(i));
+            byte[] data = readChunk(metadata.getContainerId(), metadata.getOffset(), fr.getSizeList().get(i));
             fos.write(data);
         }
+    }
+
+    private byte[] readChunk(int containerID, Integer offset, Integer len) throws Exception {
+        byte[] data = new byte[len];
+
+        try(RandomAccessFile in = new RandomAccessFile(Container.dest + "container-" + containerID, "r")) {
+            in.seek(offset);
+            in.read(data, 0, len);
+        }
+        catch(Exception e) {
+            throw e;
+        }
+        return data;
     }
 
 

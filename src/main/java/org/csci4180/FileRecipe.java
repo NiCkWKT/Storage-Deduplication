@@ -41,14 +41,13 @@ public class FileRecipe {
                     fp.readFrom(in);
                     fpList.add(fp);
                 }
-//                System.out.println("Hello");
                 int s = 0;
                 if (in.available() > 0) {
                     s = in.readInt();
-//                    System.out.println(s);
                 }
                 sizeList.add(s);
             }
+//            System.out.println("fplist size " + fpList.size());
         }
         catch (Exception e) {
             e.printStackTrace();
@@ -92,11 +91,13 @@ public class FileRecipe {
         FileOutputStream fos = new FileOutputStream(file);
         ObjectOutputStream out = new ObjectOutputStream(fos);
         int size = fpList.size();
+//        System.out.println(size);
         out.writeInt(size);
         for(int i = 0; i < size; i++) {
             fpList.get(i).writeTo(out);
             out.writeInt(sizeList.get(i));
         }
+        out.flush();
     }
 
     public static String getPath(String path) {
