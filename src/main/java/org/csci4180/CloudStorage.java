@@ -24,8 +24,8 @@ public class CloudStorage {
                 if (container.getOffset() + size > 1048576) {
                     container.saveChunks();
                 }
-                container.addChunk(chunk);
                 fpi.updateChunkMetadata(fp, container.getContainerID(), container.getOffset());
+                container.addChunk(chunk);
                 fpi.setNumOfUniqueChunks(fpi.getNumOfUniqueChunks() + 1);
                 fpi.setUniqueByteSum(fpi.getUniqueByteSum() + size);
             }
@@ -47,7 +47,7 @@ public class CloudStorage {
     }
 
     public void download(String path, String localFileName) throws Exception {
-        File file = new File(FileRecipe.getPath(path));
+        File file = new File(FileRecipe.getInputPath(path));
         if (!file.exists()) {
             System.err.println("Error: File does not exist");
             System.exit(1);
@@ -62,33 +62,16 @@ public class CloudStorage {
 
         FileOutputStream fos = new FileOutputStream(outFile);
 
-        System.out.println(fr.getFpList().size());
+//        System.out.println(fr.getFpList().size());
 
-//        for (int i = 0; i < fr.getFpList().size() ; i++) {
-//            ChunkMetadata metadata = fpi.getChunkMetadata(fr.getFpList().get(i));
-//            Container container = new Container(metadata.getContainerId(), metadata.getOffset());
-//            byte[] data = container.readFrom(fr.getSizeList().get(i));
-//            fos.write(data);
-//        }
-
-        for(int i = 0; i < fr.getFpList().size(); i++) {
+        for (int i = 0; i < fr.getFpList().size() ; i++) {
             ChunkMetadata metadata = fpi.getChunkMetadata(fr.getFpList().get(i));
-            byte[] data = readChunk(metadata.getContainerId(), metadata.getOffset(), fr.getSizeList().get(i));
+            Container container = new Container(metadata.getContainerId(), metadata.getOffset());
+            byte[] data = container.readFrom(fr.getSizeList().get(i));
+//            System.out.println(data.length);
             fos.write(data);
         }
-    }
-
-    private byte[] readChunk(int containerID, Integer offset, Integer len) throws Exception {
-        byte[] data = new byte[len];
-
-        try(RandomAccessFile in = new RandomAccessFile(Container.dest + "container-" + containerID, "r")) {
-            in.seek(offset);
-            in.read(data, 0, len);
-        }
-        catch(Exception e) {
-            throw e;
-        }
-        return data;
+        fos.flush();
     }
 
 

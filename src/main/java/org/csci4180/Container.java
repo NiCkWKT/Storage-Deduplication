@@ -61,8 +61,8 @@ public class Container {
         out.flush();
 
         containerId++;
-        offset = 0;
         chunks = new ArrayList<>();
+        offset = 0;
     }
 
     public byte[] readFrom(int size) throws Exception {

@@ -16,7 +16,7 @@ public class FileRecipe {
     }
 
     public FileRecipe(String path) {
-        File file = new File(getPath(path));
+        File file = new File(getInputPath(path));
         if(!file.exists()) {
             System.err.println("Error: File does not exist in Recipe");
             System.exit(1);
@@ -33,7 +33,7 @@ public class FileRecipe {
             fpList = new ArrayList<>(size);
             sizeList = new ArrayList<>(size);
 
-            System.out.println("SIZE " + size);
+//            System.out.println("SIZE " + size);
 
             for(int i = 0; i < size; i++) {
                 FingerPrint fp = new FingerPrint();
@@ -80,7 +80,7 @@ public class FileRecipe {
     }
 
     public void writeTo(String path) throws Exception {
-        File file = new File(getPath(path));
+        File file = new File(getInputPath(path));
         if(file.exists()) {
             boolean isDeleted = file.delete();
         }
@@ -100,18 +100,21 @@ public class FileRecipe {
         out.flush();
     }
 
-    public static String getPath(String path) {
-        return DIR + hashPath(path);
+    public static String getInputPath(String path) {
+        return DIR + hashString(path);
     }
 
-    public static String hashPath(String path) {
-        String hex = "0123456789ABCDEF";
+    public static String hashString(String path) {
+        String s = "0123456789ABCDEF";
+        char[] ca = s.toCharArray();
         char[] hexChars = new char[path.length() * 2];
-        for(int i = 0; i < path.length(); i++) {
-            int val = path.charAt(i) & 0xFF;
-            hexChars[i * 2] = hex.charAt(val >>> 4);
-            hexChars[i * 2 + 1] = hex.charAt(val & 0x0F);
+
+        for (int i = 0; i < path.length(); i++) {
+            int v = path.charAt(i) & 0xFF;
+            hexChars[i * 2] = ca[v >>> 4];
+            hexChars[i * 2 + 1] = ca[v & 0x0F];
         }
+
         return new String(hexChars);
     }
 }

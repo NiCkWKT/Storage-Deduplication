@@ -23,13 +23,13 @@ public class FingerprintIndex {
         if (file.exists()) {
             FileInputStream fis = new FileInputStream(file);
             ObjectInputStream in = new ObjectInputStream(fis);
+            this.indexes = (Map<FingerPrint, ChunkMetadata>) in.readObject();
             this.numOfFiles = in.readInt();
             this.numOfChunks = in.readInt();
             this.numOfUniqueChunks = in.readInt();
             this.byteSum = in.readInt();
             this.uniqueByteSum = in.readInt();
             this.numOfContainers = in.readInt();
-            this.indexes = (Map<FingerPrint, ChunkMetadata>) in.readObject();
         }
         else {
             this.numOfFiles = 0;
@@ -110,13 +110,13 @@ public class FingerprintIndex {
 
         FileOutputStream fos = new FileOutputStream(file);
         ObjectOutputStream out = new ObjectOutputStream(fos);
+        out.writeObject(indexes);
         out.writeInt(numOfFiles);
         out.writeInt(numOfChunks);
         out.writeInt(numOfUniqueChunks);
         out.writeInt(byteSum);
         out.writeInt(uniqueByteSum);
         out.writeInt(numOfContainers);
-        out.writeObject(indexes);
         out.flush();
     }
 

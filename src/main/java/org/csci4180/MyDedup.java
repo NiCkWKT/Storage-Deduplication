@@ -3,6 +3,7 @@ package org.csci4180;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 
 
@@ -33,7 +34,7 @@ public class MyDedup {
             }
         }
     }
-    public static void main(String[] args) throws Exception{
+    public static void main(String[] args) throws Exception {
         // Check the number of arguments
         if (args.length < 2) {
             System.err.println("Invalid number of arguments");
@@ -62,10 +63,19 @@ public class MyDedup {
                     int d = Integer.parseInt(args[4]);
                     checkChunkSizeParameters(min_chunk, avg_chunk, max_chunk);
                     String file_to_upload = args[5];
-                    File f = new File(FileRecipe.getPath(file_to_upload));
+                    File f = new File(FileRecipe.getInputPath(file_to_upload));
                     if(f.exists()) {
                         System.out.println("Error: File already uploaded.");
                         System.exit(0);
+                    }
+                    Path path = Paths.get("data/");
+                    if (!Files.exists(path)) {
+                        try {
+                            Files.createDirectories(path);
+                        }
+                        catch (Exception e) {
+                            System.err.println("Fail to create data/");
+                        }
                     }
                     byte[] fileBuffer = Files.readAllBytes(Paths.get(file_to_upload));
                     Chunker chunker = new Chunker(min_chunk, avg_chunk, max_chunk, d);

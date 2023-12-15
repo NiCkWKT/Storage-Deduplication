@@ -34,18 +34,4 @@ public class ChunkMetadata implements Serializable {
         return offset;
     }
 
-    public void setOffset(int offset) {
-        this.offset = offset;
-    }
-
-    public void readFrom(ObjectInputStream in) throws IOException {
-        containerId = in.readInt();
-        offset = in.readInt();
-    }
-
-    public void writeTo(ObjectOutputStream out) throws IOException {
-        out.writeInt(containerId);
-        out.writeInt(offset);
-    }
-
 }
