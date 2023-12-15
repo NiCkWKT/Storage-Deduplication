@@ -57,6 +57,9 @@ public class CloudStorage {
         if (outFile.exists()) {
             outFile.delete();
         }
+        else if (outFile.getParentFile() != null) {
+            outFile.getParentFile().mkdirs();
+        }
         file.createNewFile();
         FileRecipe fr = new FileRecipe(path);
 
